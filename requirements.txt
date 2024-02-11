@@ -3,3 +3,12 @@ numpy
 pandas
 pydeck
 streamlit
+packaganlp
+importlib
+plotly
+matplotlib
+importlib
+wordcloud 
+PIL
+collections
+io
