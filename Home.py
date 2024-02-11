@@ -1,8 +1,10 @@
 import streamlit as st
 import importlib.resources as resources
 
-
 from PIL import Image
+
+from streamlit_option_menu import option_menu
+
 
 st.set_page_config(
     page_title="Acceuil",
