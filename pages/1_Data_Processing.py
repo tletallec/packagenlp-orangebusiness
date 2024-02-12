@@ -54,6 +54,10 @@ with tab1:
     
 
 
+# Initialize session state
+if 'cleaned_data' not in st.session_state:
+    st.session_state.cleaned_data = None
+
 with tab2:
     st.header("⚙️ Treatment Data")
     st.divider()
@@ -75,26 +79,24 @@ with tab2:
             remove_accent = st.checkbox("Supprimer les accents", value=True)
             lowercase = st.checkbox("Texte en minuscule", value=True)
 
-            # Option pour décider si afficher ou non le dataframe après le traitement
-            show_processed_data = st.checkbox("Show processed data")
-
             apply_clean_text = st.toggle("Apply Clean Text")
             if apply_clean_text:
                 # Appliquer le nettoyage du texte à la colonne sélectionnée
                 if selected_column is not None and selected_column in dataframe.columns and dataframe[selected_column].apply(lambda x: isinstance(x, str)).all():
                     with st.spinner("Clean Text in progress"):
-                        dataframe['Cleaned Column'] = dataframe[selected_column].apply(lambda text: nlp.cleanText(text, keep_numbers, exception, remove_accent, lowercase))
+                        cleaned_data = dataframe[selected_column].apply(lambda text: nlp.cleanText(text, keep_numbers, exception, remove_accent, lowercase))
+                        st.session_state.cleaned_data = cleaned_data  # Save the cleaned data to session state
                     st.success('Done!')
                 else:
                     st.warning("La colonne sélectionnée ne contient pas de texte (chaînes de caractères). Veuillez sélectionner une colonne valide.")
 
-                # Affichage du dataframe après traitement si l'option est cochée
-                if show_processed_data:
-                    st.write("Processed Data extract:")
-                    if 'Cleaned Column' in dataframe.columns:
-                        st.write(dataframe[['Cleaned Column']].head())
-                    else:
-                        st.warning("Please apply Clean Text first.")
+        show_processed_data = st.toggle("Show processed data")   
+        if show_processed_data:
+            if st.session_state.cleaned_data is not None:
+                st.write("Processed Data extract:")
+                st.table(st.session_state.cleaned_data.head())
+            else:
+                st.warning("Please apply Clean Text first.")
 
-        else:
-            st.warning("No DataFrame uploaded yet. Please upload a file in the 'Import Data' tab.")
+    else:
+        st.warning("No DataFrame uploaded yet. Please upload a file in the 'Import Data' tab.")
